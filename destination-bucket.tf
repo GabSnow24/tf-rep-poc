@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "dest-bucket" {
   provider = aws.destination
-  bucket   = "dst.bucket.test-cheddar-v2"
+  bucket   = "dst.bucket.test-cheddar-v3"
 }
 
 resource "aws_s3_bucket_policy" "allow_access_from_another_account" {

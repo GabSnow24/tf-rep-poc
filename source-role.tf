@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
+      identifiers = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"]
     }
 
     actions = ["sts:AssumeRole"]
@@ -28,12 +28,12 @@ data "aws_iam_policy_document" "replication" {
 
     actions = [
       "s3:ListBucket",
-                "s3:GetReplicationConfiguration",
-                "s3:GetObjectVersionForReplication",
-                "s3:GetObjectVersionAcl",
-                "s3:GetObjectVersionTagging",
-                "s3:GetObjectRetention",
-                "s3:GetObjectLegalHold"
+      "s3:GetReplicationConfiguration",
+      "s3:GetObjectVersionForReplication",
+      "s3:GetObjectVersionAcl",
+      "s3:GetObjectVersionTagging",
+      "s3:GetObjectRetention",
+      "s3:GetObjectLegalHold"
     ]
 
     resources = [
@@ -41,22 +41,57 @@ data "aws_iam_policy_document" "replication" {
       "${aws_s3_bucket.src-bucket.arn}/*",
       aws_s3_bucket.dest-bucket.arn,
       "${aws_s3_bucket.dest-bucket.arn}/*"
-      ]
+    ]
   }
 
   statement {
     effect = "Allow"
 
     actions = [
-                "s3:ReplicateObject",
-                "s3:ReplicateDelete",
-                "s3:ReplicateTags",
-                "s3:ObjectOwnerOverrideToBucketOwner"
+      "s3:InitiateReplication"
+    ]
+    resources = [
+      "${aws_s3_bucket.src-bucket.arn}/*",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetReplicationConfiguration",
+      "s3:PutInventoryConfiguration"
+
+    ]
+    resources = [
+      aws_s3_bucket.src-bucket.arn
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::dev-replication-reports/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:ReplicateObject",
+      "s3:ReplicateDelete",
+      "s3:ReplicateTags",
+      "s3:ObjectOwnerOverrideToBucketOwner"
     ]
 
     resources = [
-             "${aws_s3_bucket.src-bucket.arn}/*",
-             "${aws_s3_bucket.dest-bucket.arn}/*"
+      "${aws_s3_bucket.src-bucket.arn}/*",
+      "${aws_s3_bucket.dest-bucket.arn}/*"
     ]
   }
 }
