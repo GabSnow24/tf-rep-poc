@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "replication-role" {
-  name                  = "s3crr_role_for_src.bucket.test"
+  name                  = "s3crr_role_for_src.${aws_s3_bucket.src-bucket.id}"
   assume_role_policy    = data.aws_iam_policy_document.assume_role.json
   force_detach_policies = false
   path                  = "/service-role/"
@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "replication" {
 
 resource "aws_iam_policy" "replication" {
   provider = aws
-  name     = "rep-cheddar-policy"
+  name     = "s3crr_policy_for_src.${aws_s3_bucket.src-bucket.id}"
   policy   = data.aws_iam_policy_document.replication.json
 }
 
